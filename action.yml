@@ -1,5 +1,5 @@
 name: 'Analyse Microsoft 365 compliance results'
-description: 'Github Action to analyse Azure resources' Microsoft 365 app compliance results'
+description: 'Github Action to analyse Microsoft 365 app compliance results'
 inputs:
   report-name:
     description: 'name of the compliance report'
