@@ -20,9 +20,12 @@
   "homepage": "https://github.com/qinzhouxu/analyse-microsoft-365-compliance-results#readme",
   "dependencies": {
     "@actions/core": "^1.10.0",
-    "@actions/github": "^5.1.1"
+    "@actions/github": "^5.1.1",
+    "@azure/arm-appcomplianceautomation": "^1.0.0-beta.1",
+    "@azure/identity": "^3.1.1"
   },
   "devDependencies": {
+    "@types/node": "^18.11.11",
     "@vercel/ncc": "^0.34.0",
     "typescript": "^4.9.3"
   }
