@@ -35,7 +35,7 @@
         },
         "storageAccountName": {
             "type": "string",
-            "defaultValue": "[format('store{0}', uniqueString(resourceGroup().id))]",
+            "defaultValue": "[format('store{0}arm', uniqueString(resourceGroup().id))]",
             "metadata": {
                 "description": "The name of the Storage Account"
             }
@@ -57,7 +57,7 @@
     "outputs": {
         "resourceIds": {
             "type": "array",
-            "value": ["[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName'))]"]
+            "value": [ "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName'))]" ]
         }
     }
 }
