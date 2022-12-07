@@ -19,18 +19,18 @@ jobs:
         subscriptionId: ${{ secrets.AZURE_CREDENTIALS.subscriptionId }}
         resourceGroupName: ${{ secrets.RESOURCE_GROUP}}
         template: ./deploy/Storage.template.json
-        parameters: storageAccountType=Standard_LRS storageAccountName=mcattestadls2arm
+        parameters: storageAccountType=Standard_LRS
     - run: echo ${{ steps.deployarm.outputs.resourceIds }}
 
-    # - name: Deploy with bicep
-    #   id: deploybicep
-    #   uses: azure/arm-deploy@v1
-    #   with:
-    #     subscriptionId: ${{ secrets.AZURE_CREDENTIALS.subscriptionId }}
-    #     resourceGroupName: ${{ secrets.RESOURCE_GROUP}}
-    #     template: ./deploy/Storage.bicep
-    #     parameters: storageAccountType=Standard_LRS storageAccountName=mcattestadls2bicep
-    # - run: echo ${{ steps.deploybicep.outputs.resourceIds }}
+    - name: Deploy with bicep
+      id: deploybicep
+      uses: azure/arm-deploy@v1
+      with:
+        subscriptionId: ${{ secrets.AZURE_CREDENTIALS.subscriptionId }}
+        resourceGroupName: ${{ secrets.RESOURCE_GROUP}}
+        template: ./deploy/Storage.bicep
+        parameters: storageAccountType=Standard_LRS
+    - run: echo ${{ steps.deploybicep.outputs.resourceIds }}
 
     - name: analyse Microsoft 365 compliance results
       uses: ./ # Uses an action in the root directory
