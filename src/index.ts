@@ -8,15 +8,13 @@ async function start() {
     const token = await cred.getToken("https://management.azure.com//.default");
 
     const client = new AppComplianceAutomationToolForMicrosoft365(cred);
+    const resources = JSON.parse(core.getInput('resource-list')).map((resourceId: string) => {
+      return { resourceId: resourceId, tags: {} };
+    });
 
     const params = {
       properties: {
-        resources: [
-          {
-            resourceId: "/subscriptions/1a033ab8-736d-473f-9927-65241c799738/resourceGroups/TESTVM/providers/Microsoft.Compute/virtualMachines/smallvm",
-            tags: {}
-          }
-        ],
+        resources,
         timeZone: "China Standard Time",
         triggerTime: new Date("2022-12-05T18:00:00.000Z")
       }
@@ -36,7 +34,7 @@ async function start() {
     const req = await client.report.beginCreateOrUpdate(reportName, params, options);
     await req.pollUntilDone();
 
-    console.log(`Successfully created report ${reportName}`);
+    core.info(`Successfully created report ${reportName}`);
 
   } catch (error) {
     core.setFailed(error.message);
