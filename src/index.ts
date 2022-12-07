@@ -2,6 +2,7 @@ import * as core from "@actions/core";
 import { AppComplianceAutomationToolForMicrosoft365 } from "@azure/arm-appcomplianceautomation";
 import { PolicyInsightsClient } from "@azure/arm-policyinsights";
 import { AzureCliCredential } from "@azure/identity";
+import * as realTimeConfig from "./config/m365_policies_realtime.json";
 
 async function start() {
   try {
@@ -78,11 +79,19 @@ async function getPolicyStates(cred: AzureCliCredential, resourceIds: string[]) 
 
     for await (let policyState of iter) {
       const resourceId = policyState.resourceId ?? "";
-      if (lowerCaseResourceIds.includes(resourceId.toLocaleLowerCase())) {
+      if (
+        isRealTimePolicy(policyState.policyDefinitionId ?? "") &&
+        lowerCaseResourceIds.includes(resourceId.toLocaleLowerCase())
+      ) {
         core.info(`Resource Id: ${resourceId}\tDefinition Id: ${policyState.policyDefinitionId}\tIs Compliant: ${policyState.isCompliant}`);
       }
     }
   }
+}
+
+const realTimeIds = realTimeConfig.realtime.map(id => `/providers/microsoft.authorization/policydefinitions/${id.toLowerCase()}`);
+function isRealTimePolicy(policyId: string): boolean {
+  return realTimeIds.includes(policyId.toLowerCase());
 }
 
 start();
