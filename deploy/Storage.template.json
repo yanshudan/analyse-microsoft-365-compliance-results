@@ -35,20 +35,17 @@
         },
         "storageAccountName": {
             "type": "string",
-            "defaultValue": "[format('store{0}', uniqueString(resourceGroup().id))]",
+            "defaultValue": "[format('store{0}', uniqueString(resourceGroup().id),'arm')]",
             "metadata": {
                 "description": "The name of the Storage Account"
             }
         }
     },
-    "variables": {
-        "uniqueStorageName": "[concat('testadls', uniqueString(resourceGroup().id))]"
-    },
     "resources": [
         {
             "type": "Microsoft.Storage/storageAccounts",
             "apiVersion": "2022-05-01",
-            "name": "[variables('uniqueStorageName')]",
+            "name": "[parameters('storageAccountName')]",
             "location": "[parameters('location')]",
             "sku": {
                 "name": "[parameters('storageAccountType')]"

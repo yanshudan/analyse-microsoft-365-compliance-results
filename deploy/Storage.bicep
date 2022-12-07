@@ -15,7 +15,7 @@ param storageAccountType string = 'Standard_LRS'
 param location string = resourceGroup().location
 
 @description('The name of the Storage Account')
-param storageAccountName string = 'store${uniqueString(resourceGroup().id)}'
+param storageAccountName string = 'store${uniqueString(resourceGroup().id)}bicep'
 
 resource sa 'Microsoft.Storage/storageAccounts@2022-05-01' = {
   name: storageAccountName
