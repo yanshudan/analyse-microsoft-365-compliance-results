@@ -48,14 +48,12 @@ function start() {
             const cred = new identity_1.AzureCliCredential();
             const token = yield cred.getToken("https://management.azure.com//.default");
             const client = new arm_appcomplianceautomation_1.AppComplianceAutomationToolForMicrosoft365(cred);
+            const resources = JSON.parse(core.getInput('resource-list')).map((resourceId) => {
+                return { resourceId: resourceId, tags: {} };
+            });
             const params = {
                 properties: {
-                    resources: [
-                        {
-                            resourceId: "/subscriptions/1a033ab8-736d-473f-9927-65241c799738/resourceGroups/TESTVM/providers/Microsoft.Compute/virtualMachines/smallvm",
-                            tags: {}
-                        }
-                    ],
+                    resources,
                     timeZone: "China Standard Time",
                     triggerTime: new Date("2022-12-05T18:00:00.000Z")
                 }
@@ -72,7 +70,7 @@ function start() {
             const reportName = core.getInput('report-name');
             const req = yield client.report.beginCreateOrUpdate(reportName, params, options);
             yield req.pollUntilDone();
-            console.log(`Successfully created report ${reportName}`);
+            core.info(`Successfully created report ${reportName}`);
         }
         catch (error) {
             core.setFailed(error.message);
