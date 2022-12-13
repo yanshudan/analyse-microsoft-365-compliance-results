@@ -1,6 +1,7 @@
 import * as core from "@actions/core";
 import { AppComplianceAutomationToolForMicrosoft365 } from "@azure/arm-appcomplianceautomation";
 import { PolicyInsightsClient } from "@azure/arm-policyinsights";
+import { ResourceManagementClient, ResourceReference } from "@azure/arm-resources";
 import { AzureCliCredential } from "@azure/identity";
 import * as realTimeConfig from "./config/m365_policies_realtime.json";
 
@@ -8,14 +9,29 @@ async function start() {
   try {
     const cred = new AzureCliCredential();
 
+    const deploymentName = core.getInput('deployment-name');
+    const resourceGroupName = core.getInput('resource-group');
+    const subscriptionId = core.getInput('subscription-id');
     const reportName = core.getInput('report-name');
-    const resourceIds = JSON.parse(core.getInput('resource-list'));
+
+    const resourceIds = await getResourceIdsByDeployment(cred, subscriptionId, resourceGroupName, deploymentName);
 
     await createOrUpdateReport(cred, reportName, resourceIds);
     await getPolicyStates(cred, resourceIds);
   } catch (error) {
     core.setFailed(error.message);
   }
+}
+
+async function getResourceIdsByDeployment(cred: AzureCliCredential, subscriptionId: string, resourceGroupName: string, deploymentName: string): Promise<string[]> {
+  const depclient = new ResourceManagementClient(cred, subscriptionId);
+  const deployment = await depclient.deployments.get(resourceGroupName, deploymentName);
+
+  return deployment.properties?.outputResources?.map(
+    (resource: ResourceReference) => {
+      return resource.id ?? "null"
+    }
+  ) ?? [];
 }
 
 async function createOrUpdateReport(cred: AzureCliCredential, reportName: string, resourceIds: string[]) {
