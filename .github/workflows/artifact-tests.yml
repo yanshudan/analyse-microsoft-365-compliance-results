@@ -16,7 +16,7 @@ jobs:
       id: deployarm
       uses: azure/arm-deploy@v1
       with:
-        subscriptionId: ${{ secrets.AZURE_CREDENTIALS.subscriptionId }}
+        subscriptionId: ${{ secrets.SUBSCRIPTION_ID }}
         resourceGroupName: ${{ secrets.RESOURCE_GROUP}}
         template: ./deploy/Storage.template.json
         parameters: storageAccountType=Standard_LRS
@@ -26,7 +26,7 @@ jobs:
       id: deploybicep
       uses: azure/arm-deploy@v1
       with:
-        subscriptionId: ${{ secrets.AZURE_CREDENTIALS.subscriptionId }}
+        subscriptionId: ${{ secrets.SUBSCRIPTION_ID }}
         resourceGroupName: ${{ secrets.RESOURCE_GROUP}}
         template: ./deploy/Storage.bicep
         parameters: storageAccountType=Standard_LRS
@@ -37,5 +37,5 @@ jobs:
       with:
         report-name: 'test-report'
         deployment-name: ${{ steps.deployarm.outputs.deploymentName }}
-        subscription-id: ${{ secrets.AZURE_CREDENTIALS.subscriptionId }}
+        subscription-id: ${{ secrets.SUBSCRIPTION_ID }}
         resource-group: ${{ secrets.RESOURCE_GROUP}}
