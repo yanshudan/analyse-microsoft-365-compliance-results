@@ -4,10 +4,15 @@ inputs:
   report-name:
     description: 'name of the compliance report'
     required: true
-  resource-list:
-    description: 'list of resource ids deployed in the action'
+  deployment-name:
+    description: 'deployment name'
+    required: true
+  subscription-id:
+    description: 'subscription'
+    required: true
+  resource-group:
+    description: 'resource-group'
     required: true
 runs:
   using: 'node16'
   main: 'dist/index.js'
-  

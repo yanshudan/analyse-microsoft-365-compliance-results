@@ -20,7 +20,7 @@ jobs:
         resourceGroupName: ${{ secrets.RESOURCE_GROUP}}
         template: ./deploy/Storage.template.json
         parameters: storageAccountType=Standard_LRS
-    - run: echo ${{ steps.deployarm.outputs.resourceIds }}
+    - run: echo ${{ steps.deployarm.outputs.deploymentName }}
 
     - name: Deploy with bicep
       id: deploybicep
@@ -30,10 +30,12 @@ jobs:
         resourceGroupName: ${{ secrets.RESOURCE_GROUP}}
         template: ./deploy/Storage.bicep
         parameters: storageAccountType=Standard_LRS
-    - run: echo ${{ steps.deploybicep.outputs.resourceIds }}
+    - run: echo ${{ steps.deploybicep.outputs.deploymentName }}
 
     - name: analyse Microsoft 365 compliance results
       uses: ./ # Uses an action in the root directory
       with:
         report-name: 'test-report'
-        resource-list: ${{ steps.deployarm.outputs.resourceIds }}
+        deployment-name: ${{ steps.deployarm.outputs.deploymentName }}
+        subscription-id: ${{ secrets.AZURE_CREDENTIALS.subscriptionId }}
+        resource-group: ${{ secrets.RESOURCE_GROUP}}

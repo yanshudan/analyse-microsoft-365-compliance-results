@@ -27,6 +27,4 @@ resource sa 'Microsoft.Storage/storageAccounts@2022-05-01' = {
   properties: {}
 }
 
-output resourceIds array= [
-  sa.id
-]
+output deploymentName string= deployment().name
