@@ -16,24 +16,26 @@ jobs:
       id: deployarm
       uses: azure/arm-deploy@v1
       with:
-        subscriptionId: ${{ secrets.AZURE_CREDENTIALS.subscriptionId }}
+        subscriptionId: ${{ secrets.SUBSCRIPTION_ID }}
         resourceGroupName: ${{ secrets.RESOURCE_GROUP}}
         template: ./deploy/Storage.template.json
         parameters: storageAccountType=Standard_LRS
-    - run: echo ${{ steps.deployarm.outputs.resourceIds }}
+    - run: echo ${{ steps.deployarm.outputs.deploymentName }}
 
     - name: Deploy with bicep
       id: deploybicep
       uses: azure/arm-deploy@v1
       with:
-        subscriptionId: ${{ secrets.AZURE_CREDENTIALS.subscriptionId }}
+        subscriptionId: ${{ secrets.SUBSCRIPTION_ID }}
         resourceGroupName: ${{ secrets.RESOURCE_GROUP}}
         template: ./deploy/Storage.bicep
         parameters: storageAccountType=Standard_LRS
-    - run: echo ${{ steps.deploybicep.outputs.resourceIds }}
+    - run: echo ${{ steps.deploybicep.outputs.deploymentName }}
 
     - name: analyse Microsoft 365 compliance results
       uses: ./ # Uses an action in the root directory
       with:
         report-name: 'test-report'
-        resource-list: ${{ steps.deployarm.outputs.resourceIds }}
+        deployment-name: ${{ steps.deployarm.outputs.deploymentName }}
+        subscription-id: ${{ secrets.SUBSCRIPTION_ID }}
+        resource-group: ${{ secrets.RESOURCE_GROUP}}
