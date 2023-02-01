@@ -1,7 +1,7 @@
 import * as core from "@actions/core";
 import { PolicyInsightsClient } from "@azure/arm-policyinsights";
 import { AzureCliCredential } from "@azure/identity";
-import { isRealTimePolicy } from "../utils";
+import { isRealTimePolicy } from "../utils/common";
 
 export async function getPolicyStates(cred: AzureCliCredential, resourceIds: string[]) {
   const subscriptionSet = new Set<string>();

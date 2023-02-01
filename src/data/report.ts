@@ -1,6 +1,6 @@
 import { AppComplianceAutomationToolForMicrosoft365 } from "@azure/arm-appcomplianceautomation";
 import { AzureCliCredential } from "@azure/identity";
-import { getCredToken } from "../utils";
+import { getCredToken } from "../utils/common";
 
 export async function createOrUpdateReport(cred: AzureCliCredential, reportName: string, resourceIds: string[]) {
   const client = new AppComplianceAutomationToolForMicrosoft365(cred);

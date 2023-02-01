@@ -37,5 +37,6 @@ jobs:
       with:
         report-name: 'test-report'
         deployment-name: ${{ steps.deployarm.outputs.deploymentName }}
+        tenant-id: ${{ secrets.TENANT_ID }}
         subscription-id: ${{ secrets.SUBSCRIPTION_ID }}
         resource-group: ${{ secrets.RESOURCE_GROUP}}
