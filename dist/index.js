@@ -1,7 +1,40 @@
 require('./sourcemap-register.js');/******/ (() => { // webpackBootstrap
 /******/ 	var __webpack_modules__ = ({
 
-/***/ 4822:
+/***/ 5533:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.getResourceIdsByDeployment = void 0;
+const arm_resources_1 = __nccwpck_require__(4280);
+function getResourceIdsByDeployment(cred, subscriptionId, resourceGroupName, deploymentName) {
+    var _a, _b, _c;
+    return __awaiter(this, void 0, void 0, function* () {
+        const depclient = new arm_resources_1.ResourceManagementClient(cred, subscriptionId);
+        const deployment = yield depclient.deployments.get(resourceGroupName, deploymentName);
+        return (_c = (_b = (_a = deployment.properties) === null || _a === void 0 ? void 0 : _a.outputResources) === null || _b === void 0 ? void 0 : _b.map((resource) => {
+            var _a;
+            return (_a = resource.id) !== null && _a !== void 0 ? _a : "null";
+        })) !== null && _c !== void 0 ? _c : [];
+    });
+}
+exports.getResourceIdsByDeployment = getResourceIdsByDeployment;
+
+
+/***/ }),
+
+/***/ 8266:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 "use strict";
@@ -46,68 +79,10 @@ var __asyncValues = (this && this.__asyncValues) || function (o) {
     function settle(resolve, reject, d, v) { Promise.resolve(v).then(function(v) { resolve({ value: v, done: d }); }, reject); }
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.getPolicyStates = void 0;
 const core = __importStar(__nccwpck_require__(2186));
-const arm_appcomplianceautomation_1 = __nccwpck_require__(598);
 const arm_policyinsights_1 = __nccwpck_require__(6165);
-const arm_resources_1 = __nccwpck_require__(4280);
-const identity_1 = __nccwpck_require__(3084);
-const realTimeConfig = __importStar(__nccwpck_require__(5483));
-function start() {
-    return __awaiter(this, void 0, void 0, function* () {
-        try {
-            const cred = new identity_1.AzureCliCredential();
-            const deploymentName = core.getInput('deployment-name');
-            const resourceGroupName = core.getInput('resource-group');
-            const subscriptionId = core.getInput('subscription-id');
-            const reportName = core.getInput('report-name');
-            const resourceIds = yield getResourceIdsByDeployment(cred, subscriptionId, resourceGroupName, deploymentName);
-            yield createOrUpdateReport(cred, reportName, resourceIds);
-            yield getPolicyStates(cred, resourceIds);
-        }
-        catch (error) {
-            core.setFailed(error.message);
-        }
-    });
-}
-function getResourceIdsByDeployment(cred, subscriptionId, resourceGroupName, deploymentName) {
-    var _a, _b, _c;
-    return __awaiter(this, void 0, void 0, function* () {
-        const depclient = new arm_resources_1.ResourceManagementClient(cred, subscriptionId);
-        const deployment = yield depclient.deployments.get(resourceGroupName, deploymentName);
-        return (_c = (_b = (_a = deployment.properties) === null || _a === void 0 ? void 0 : _a.outputResources) === null || _b === void 0 ? void 0 : _b.map((resource) => {
-            var _a;
-            return (_a = resource.id) !== null && _a !== void 0 ? _a : "null";
-        })) !== null && _c !== void 0 ? _c : [];
-    });
-}
-function createOrUpdateReport(cred, reportName, resourceIds) {
-    return __awaiter(this, void 0, void 0, function* () {
-        const client = new arm_appcomplianceautomation_1.AppComplianceAutomationToolForMicrosoft365(cred);
-        const resources = resourceIds.map((resourceId) => {
-            return { resourceId: resourceId, tags: {} };
-        });
-        const token = yield cred.getToken("https://management.azure.com//.default");
-        const params = {
-            properties: {
-                resources,
-                timeZone: "China Standard Time",
-                triggerTime: new Date("2022-12-05T18:00:00.000Z")
-            }
-        };
-        const options = {
-            requestOptions: {
-                customHeaders: {
-                    "Authorization": `Bearer ${token.token}`,
-                    "x-ms-aad-user-token": `Bearer ${token.token}`,
-                    "Content-Type": "application/json"
-                }
-            }
-        };
-        const req = yield client.report.beginCreateOrUpdate(reportName, params, options);
-        yield req.pollUntilDone();
-        core.info(`Successfully created or updated report ${reportName}`);
-    });
-}
+const utils_1 = __nccwpck_require__(918);
 function getPolicyStates(cred, resourceIds) {
     var _a, e_1, _b, _c;
     var _d, _e;
@@ -126,7 +101,6 @@ function getPolicyStates(cred, resourceIds) {
             const promise = client.policyStates.beginTriggerSubscriptionEvaluationAndWait(client.subscriptionId);
             triggerPromises.push(promise);
         }
-        core.info("Evaluating policy states for all subscriptions...");
         yield Promise.all(triggerPromises);
         core.info("Generating results...");
         const lowerCaseResourceIds = resourceIds.map(id => id.toLocaleLowerCase());
@@ -139,7 +113,7 @@ function getPolicyStates(cred, resourceIds) {
                     try {
                         let policyState = _c;
                         const resourceId = (_d = policyState.resourceId) !== null && _d !== void 0 ? _d : "";
-                        if (isRealTimePolicy((_e = policyState.policyDefinitionId) !== null && _e !== void 0 ? _e : "") &&
+                        if ((0, utils_1.isRealTimePolicy)((_e = policyState.policyDefinitionId) !== null && _e !== void 0 ? _e : "") &&
                             lowerCaseResourceIds.includes(resourceId.toLocaleLowerCase())) {
                             if (policyState.isCompliant) {
                                 core.info(`Resource Id: ${resourceId}\tDefinition Id: ${policyState.policyDefinitionId}\tIs Compliant: ${policyState.isCompliant}`);
@@ -164,11 +138,180 @@ function getPolicyStates(cred, resourceIds) {
         }
     });
 }
+exports.getPolicyStates = getPolicyStates;
+
+
+/***/ }),
+
+/***/ 3478:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.createOrUpdateReport = void 0;
+const arm_appcomplianceautomation_1 = __nccwpck_require__(598);
+const utils_1 = __nccwpck_require__(918);
+function createOrUpdateReport(cred, reportName, resourceIds) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const client = new arm_appcomplianceautomation_1.AppComplianceAutomationToolForMicrosoft365(cred);
+        const resources = resourceIds.map((resourceId) => {
+            return { resourceId: resourceId, tags: {} };
+        });
+        const token = yield (0, utils_1.getCredToken)(cred);
+        const params = {
+            properties: {
+                resources,
+                timeZone: "China Standard Time",
+                triggerTime: new Date("2022-12-05T18:00:00.000Z")
+            }
+        };
+        const options = {
+            requestOptions: {
+                customHeaders: {
+                    "Authorization": token,
+                    "x-ms-aad-user-token": token,
+                    "Content-Type": "application/json"
+                }
+            }
+        };
+        const req = yield client.report.beginCreateOrUpdate(reportName, params, options);
+        yield req.pollUntilDone();
+    });
+}
+exports.createOrUpdateReport = createOrUpdateReport;
+
+
+/***/ }),
+
+/***/ 4822:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+const core = __importStar(__nccwpck_require__(2186));
+const identity_1 = __nccwpck_require__(3084);
+const deployment_1 = __nccwpck_require__(5533);
+const policyStates_1 = __nccwpck_require__(8266);
+const report_1 = __nccwpck_require__(3478);
+function start() {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            const cred = new identity_1.AzureCliCredential();
+            const deploymentName = core.getInput('deployment-name');
+            const resourceGroupName = core.getInput('resource-group');
+            const subscriptionId = core.getInput('subscription-id');
+            const reportName = core.getInput('report-name');
+            const resourceIds = yield (0, deployment_1.getResourceIdsByDeployment)(cred, subscriptionId, resourceGroupName, deploymentName);
+            yield (0, report_1.createOrUpdateReport)(cred, reportName, resourceIds);
+            core.info(`Successfully created or updated report ${reportName}`);
+            core.info("Evaluating policy states for all subscriptions...");
+            yield (0, policyStates_1.getPolicyStates)(cred, resourceIds);
+        }
+        catch (error) {
+            core.setFailed(error.message);
+        }
+    });
+}
+start();
+
+
+/***/ }),
+
+/***/ 918:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.getCredToken = exports.isRealTimePolicy = void 0;
+const realTimeConfig = __importStar(__nccwpck_require__(5483));
 const realTimeIds = realTimeConfig.realtime.map(id => `/providers/microsoft.authorization/policydefinitions/${id.toLowerCase()}`);
 function isRealTimePolicy(policyId) {
     return realTimeIds.includes(policyId.toLowerCase());
 }
-start();
+exports.isRealTimePolicy = isRealTimePolicy;
+function getCredToken(cred) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const token = yield cred.getToken("https://management.azure.com//.default");
+        return `Bearer ${token.token}`;
+    });
+}
+exports.getCredToken = getCredToken;
 
 
 /***/ }),

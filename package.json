@@ -24,7 +24,8 @@
     "@azure/arm-appcomplianceautomation": "^1.0.0-beta.1",
     "@azure/arm-policyinsights": "^5.0.0",
     "@azure/arm-resources": "^5.1.0",
-    "@azure/identity": "^3.1.1"
+    "@azure/identity": "^3.1.1",
+    "axios": "^1.3.0"
   },
   "devDependencies": {
     "@types/node": "^18.11.11",
