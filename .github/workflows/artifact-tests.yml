@@ -35,8 +35,7 @@ jobs:
     - name: analyse Microsoft 365 compliance results
       uses: ./ # Uses an action in the root directory
       with:
+        cred: ${{ secrets.AZURE_CREDENTIALS }}
         report-name: 'test-report'
         deployment-name: ${{ steps.deployarm.outputs.deploymentName }}
-        tenant-id: ${{ secrets.TENANT_ID }}
-        subscription-id: ${{ secrets.SUBSCRIPTION_ID }}
         resource-group: ${{ secrets.RESOURCE_GROUP}}

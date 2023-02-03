@@ -13,9 +13,15 @@ async function start() {
 
     const deploymentName = core.getInput('deployment-name');
     const resourceGroupName = core.getInput('resource-group');
-    const tenantId = core.getInput("tenant-id");
-    const subscriptionId = core.getInput('subscription-id');
     const reportName = core.getInput('report-name');
+
+    const credObj = JSON.parse(core.getInput('cred'));
+    const subscriptionId = credObj.subscriptionId;
+    const tenantId = credObj.tenantId;
+
+    if (!subscriptionId || !tenantId) {
+      throw new Error("Please configure Azure credential properly");
+    }
 
     const resourceIds = await getResourceIdsByDeployment(cred, subscriptionId, resourceGroupName, deploymentName);
     const subscriptionIds = resourceIds.map(id => getResourceSubscription(id));

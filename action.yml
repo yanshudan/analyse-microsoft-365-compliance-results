@@ -7,11 +7,8 @@ inputs:
   deployment-name:
     description: 'deployment name'
     required: true
-  tenant-id:
-    description: 'tenant'
-    required: true
-  subscription-id:
-    description: 'subscription'
+  cred:
+    description: 'Azure credential'
     required: true
   resource-group:
     description: 'resource-group'
