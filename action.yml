@@ -4,8 +4,8 @@ inputs:
   report-name:
     description: 'name of the compliance report'
     required: true
-  deployment-name:
-    description: 'deployment name'
+  deployment-id:
+    description: 'deployment id'
     required: true
   cred:
     description: 'Azure credential'
