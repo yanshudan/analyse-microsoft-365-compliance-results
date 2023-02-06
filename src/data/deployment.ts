@@ -8,7 +8,7 @@ export async function getResourceIdsByDeployment(
 
   const tokens = deploymentId.split("/");
   const deploymentMeta = new Map<string, string>()
-  for (let i = 0; i < tokens.length - 1; i = i + 2) {
+  for (let i = 1; i < tokens.length - 1; i = i + 2) {
     deploymentMeta.set(tokens[i], tokens[i + 1]);
   }
 

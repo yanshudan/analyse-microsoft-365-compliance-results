@@ -54,15 +54,20 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.getResourceIdsByDeployment = void 0;
 const arm_resources_1 = __nccwpck_require__(4280);
-function getResourceIdsByDeployment(cred, subscriptionId, resourceGroupName, deploymentName) {
-    var _a, _b, _c;
+function getResourceIdsByDeployment(cred, deploymentId) {
+    var _a, _b, _c, _d, _e, _f;
     return __awaiter(this, void 0, void 0, function* () {
-        const depclient = new arm_resources_1.ResourceManagementClient(cred, subscriptionId);
-        const deployment = yield depclient.deployments.get(resourceGroupName, deploymentName);
-        return (_c = (_b = (_a = deployment.properties) === null || _a === void 0 ? void 0 : _a.outputResources) === null || _b === void 0 ? void 0 : _b.map((resource) => {
+        const tokens = deploymentId.split("/");
+        const deploymentMeta = new Map();
+        for (let i = 1; i < tokens.length - 1; i = i + 2) {
+            deploymentMeta.set(tokens[i], tokens[i + 1]);
+        }
+        const depclient = new arm_resources_1.ResourceManagementClient(cred, (_a = deploymentMeta.get("subscriptions")) !== null && _a !== void 0 ? _a : "");
+        const deployment = yield depclient.deployments.get((_b = deploymentMeta.get("resourceGroups")) !== null && _b !== void 0 ? _b : "", (_c = deploymentMeta.get("deployments")) !== null && _c !== void 0 ? _c : "");
+        return (_f = (_e = (_d = deployment.properties) === null || _d === void 0 ? void 0 : _d.outputResources) === null || _e === void 0 ? void 0 : _e.map((resource) => {
             var _a;
             return (_a = resource.id) !== null && _a !== void 0 ? _a : "null";
-        })) !== null && _c !== void 0 ? _c : [];
+        })) !== null && _f !== void 0 ? _f : [];
     });
 }
 exports.getResourceIdsByDeployment = getResourceIdsByDeployment;
@@ -330,8 +335,7 @@ function start() {
         try {
             const cred = new identity_1.AzureCliCredential();
             const token = yield (0, common_1.getCredToken)(cred);
-            const deploymentName = core.getInput('deployment-name');
-            const resourceGroupName = core.getInput('resource-group');
+            const deploymentId = core.getInput('deployment-id');
             const reportName = core.getInput('report-name');
             const credObj = JSON.parse(core.getInput('cred'));
             const subscriptionId = credObj.subscriptionId;
@@ -339,7 +343,7 @@ function start() {
             if (!subscriptionId || !tenantId) {
                 throw new Error("Please configure Azure credential properly");
             }
-            const resourceIds = yield (0, deployment_1.getResourceIdsByDeployment)(cred, subscriptionId, resourceGroupName, deploymentName);
+            const resourceIds = yield (0, deployment_1.getResourceIdsByDeployment)(cred, deploymentId);
             const subscriptionIds = resourceIds.map(id => (0, common_1.getResourceSubscription)(id));
             yield (0, onboard_1.onboard)(token, tenantId, subscriptionIds);
             core.info(`Successfully onboarded subscriptions`);
