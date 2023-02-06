@@ -22,15 +22,15 @@ jobs:
         parameters: storageAccountType=Standard_LRS
     - run: echo ${{ steps.deployarm.outputs.deploymentId }}
 
-    # - name: Deploy with bicep
-    #   id: deploybicep
-    #   uses: azure/arm-deploy@v1
-    #   with:
-    #     subscriptionId: ${{ secrets.SUBSCRIPTION_ID }}
-    #     resourceGroupName: ${{ secrets.RESOURCE_GROUP}}
-    #     template: ./deploy/Storage.bicep
-    #     parameters: storageAccountType=Standard_LRS
-    # - run: echo ${{ steps.deploybicep.outputs.deploymentId }}
+    - name: Deploy with bicep
+      id: deploybicep
+      uses: azure/arm-deploy@v1
+      with:
+        subscriptionId: ${{ secrets.SUBSCRIPTION_ID }}
+        resourceGroupName: ${{ secrets.RESOURCE_GROUP}}
+        template: ./deploy/Storage.bicep
+        parameters: storageAccountType=Standard_LRS
+    - run: echo ${{ steps.deploybicep.outputs.deploymentId }}
 
     - name: analyse Microsoft 365 compliance results
       uses: ./ # Uses an action in the root directory
