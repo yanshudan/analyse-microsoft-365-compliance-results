@@ -11,8 +11,7 @@ async function start() {
     const cred = new AzureCliCredential();
     const token = await getCredToken(cred);
 
-    const deploymentName = core.getInput('deployment-name');
-    const resourceGroupName = core.getInput('resource-group');
+    const deploymentId = core.getInput('deployment-id');
     const reportName = core.getInput('report-name');
 
     const credObj = JSON.parse(core.getInput('cred'));
@@ -23,7 +22,7 @@ async function start() {
       throw new Error("Please configure Azure credential properly");
     }
 
-    const resourceIds = await getResourceIdsByDeployment(cred, subscriptionId, resourceGroupName, deploymentName);
+    const resourceIds = await getResourceIdsByDeployment(cred, deploymentId);
     const subscriptionIds = resourceIds.map(id => getResourceSubscription(id));
 
     await onboard(token, tenantId, subscriptionIds);
